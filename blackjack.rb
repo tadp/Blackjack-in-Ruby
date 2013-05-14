@@ -10,6 +10,8 @@
 #   	cards[random]<<Hold cards
 #   end
 
+require "pry"
+
 def calculate_total(cards) 
 #[['H','3'],['S','Q'] ... ]
   arr = cards.map{|e| e[1]}
@@ -57,10 +59,11 @@ mycards<<deck.pop
 dealercards<<deck.pop
 mycards<<deck.pop
 dealercards<<deck.pop
-
 dealer_total=calculate_total(dealercards)
 mytotal=calculate_total(mycards)
-
+if dealer_total == 21
+  puts "Dealer has Blackjack! You lose!"
+end
 
 
 while true
@@ -84,20 +87,33 @@ while true
 
     elsif hit_or_stay.downcase=="stay"
         puts "Ok, you have chosen to stay"
+        puts "Dealer currently has: #{dealercards}, for a total of #{dealer_total}"
+        puts "Dealiing..."
         dealercards<<deck.pop
         dealer_total=calculate_total(dealercards)
         puts "Dealer has: #{dealercards}, for a total of #{dealer_total}"
-        puts "Dealer Busts! You win" if dealer_total>21
+          while dealer_total < 17
+            puts "Dealer has: #{dealercards}, for a total of #{dealer_total}"
+            puts "Dealing..."
+            dealercards<<deck.pop
+            dealer_total=calculate_total(dealercards)
+            if dealer_total >21
+              puts "Dealer busts! You Win!"
+            end
+          end
         break
+
+        if dealer_total > mytotal
+          puts "Dealer Wins with #{dealercards}! You lose!"
+        end
+
     else "Please pick Hit or Stay"
     end
   end
 
 
-if dealer_total==21
-puts "Dealer has Blackjack! You lose"
-dealercards
-end
+
+
 
 
 
