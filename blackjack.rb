@@ -66,16 +66,18 @@ mytotal=calculate_total(mycards)
 
 while true
 puts "Dealer has: #{dealercards[0]} and #{dealercards[1]}, for a total of #{dealertotal}"
-puts "You have #{mycards[0]} and #{mycards[1]}, for a total of #{mytotal}"
+puts "You have #{mycards}, for a total of #{mytotal}"
 puts
 puts "What would you like to do?  'Hit' or 'Stay'"
 hit_or_stay=gets.chomp
 
   if hit_or_stay.to_s.downcase=="hit"
     mycards<<deck.pop
-    calculate_total(mycards)
+    p mycards
+    mytotal=calculate_total(mycards)
   elsif hit_or_stay.downcase=="stay"
     dealercards<<deck.pop
+    p dealercards
     calculate_total(dealercards)
     break
   else "Please pick Hit or Stay"
