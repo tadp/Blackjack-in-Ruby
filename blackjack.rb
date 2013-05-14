@@ -71,11 +71,15 @@ while true
   hit_or_stay=gets.chomp
 
     if hit_or_stay.to_s.downcase=="hit"
-        if mytotal>21
-          puts "You Bust!"
-        else
+        mytotal=calculate_total(mycards)
+        puts "You have #{mycards}, for a total of #{mytotal}"
+        puts "Now dealing.."
         mycards<<deck.pop
         mytotal=calculate_total(mycards)
+        puts "You have #{mycards}, for a total of #{mytotal}"
+        if mytotal>21
+          puts "You Bust!"
+          break
         end
 
     elsif hit_or_stay.downcase=="stay"
