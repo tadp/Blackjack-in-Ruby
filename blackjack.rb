@@ -22,6 +22,7 @@ def calculate_total(cards)
       total = total + 10
     else
       total += value.to_i
+    end
   end
 
   total
@@ -29,6 +30,10 @@ end
 
 #Interactive command line blackjack game
 puts "Welcome to Blackjack!"
+puts
+puts "Whats your name?"
+player_name=gets.chomp
+puts "Hi, #{player_name}!"
 
 deck = []
 suits = ['H','D','S','C']
@@ -63,6 +68,18 @@ puts
 puts "What would you like to do?  1) Hit 2) Stay"
 hit_or_stay=gets.chomp
 
+def hitstay
+  if hit_or_stay.to_s.downcase=="hit"
+    mycards<<deck.pop
+    calculate_total(mycards)
+  elsif hit_or_stay.downcase=="stay"
+    dealercards<<deck.pop
+    calculate_total(dealercards)
+  else "Please pick Hit or Stay"
+  end
+end
+
+hitstay
 
 
 
