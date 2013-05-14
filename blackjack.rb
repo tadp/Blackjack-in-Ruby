@@ -25,11 +25,6 @@ def calculate_total(cards)
   end
     #correct for Aces
     arr.select{|e| e == "A"}.count.times {total -= 10 if total > 21}
-
-  if total > 21
-    $bust=true
-  else $bust=false
-  end
   total
 end
 
@@ -69,32 +64,34 @@ mytotal=calculate_total(mycards)
 
 
 while true
-puts "Dealer has: #{dealercards[0]} and #{dealercards[1]}, for a total of #{dealer_total}"
-puts "You have #{mycards}, for a total of #{mytotal}"
-puts
-puts "What would you like to do?  'Hit' or 'Stay'"
-hit_or_stay=gets.chomp
+  puts "Dealer has: #{dealercards[0]} and #{dealercards[1]}, for a total of #{dealer_total}"
+  puts "You have #{mycards}, for a total of #{mytotal}"
+  puts
+  puts "What would you like to do?  'Hit' or 'Stay'"
+  hit_or_stay=gets.chomp
 
-  if hit_or_stay.to_s.downcase=="hit"
-    mycards<<deck.pop
-    mytotal=calculate_total(mycards)
-  elsif hit_or_stay.downcase=="stay"
-    puts "Ok, you have chosen to stay"
-    if bust
-      puts "You Bust!"
-    else
-    dealercards<<deck.pop
-    dealer_total=calculate_total(dealercards)
-    puts "Dealer has: #{dealercards}, for a total of #{dealer_total}"
-    puts "Dealer Busts! You win" if $bust
-     end
-    break
-  else "Please pick Hit or Stay"
+    if hit_or_stay.to_s.downcase=="hit"
+        if mytotal>21
+          puts "You Bust!"
+        else
+        mycards<<deck.pop
+        mytotal=calculate_total(mycards)
+        end
+
+    elsif hit_or_stay.downcase=="stay"
+        puts "Ok, you have chosen to stay"
+        dealercards<<deck.pop
+        dealer_total=calculate_total(dealercards)
+        puts "Dealer has: #{dealercards}, for a total of #{dealer_total}"
+        puts "Dealer Busts! You win" if dealertotal>21
+        end
+        break
+    else "Please pick Hit or Stay"
+    end
   end
-end
 
 
-if dealertotal=21
+if dealertotal==21
 puts "Dealer has Blackjack! You lose"
 dealercards
 end
