@@ -83,15 +83,14 @@ while true
         dealercards<<deck.pop
         dealer_total=calculate_total(dealercards)
         puts "Dealer has: #{dealercards}, for a total of #{dealer_total}"
-        puts "Dealer Busts! You win" if dealertotal>21
-        end
+        puts "Dealer Busts! You win" if dealer_total>21
         break
     else "Please pick Hit or Stay"
     end
   end
 
 
-if dealertotal==21
+if dealer_total==21
 puts "Dealer has Blackjack! You lose"
 dealercards
 end
