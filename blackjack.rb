@@ -1,6 +1,3 @@
-
-
-
 # cards
 # suits
 
@@ -18,12 +15,16 @@ def calculate_total(cards)
   arr = cards.map{|e| e[1]}
   total=0
   arr.each do |value|
-    if value.to_i == 0
+    if value == 'A'
+      total +=11
+    elsif value.to_i == 0 #J,Q,K
       total = total + 10
     else
       total += value.to_i
     end
   end
+    #correct for Aces
+    arr.select{|e| e == "A"}.count.times {total -= 10 if total > 21}
 
   total
 end
@@ -61,28 +62,25 @@ dealercards<<deck.pop
 dealertotal=calculate_total(dealercards)
 mytotal=calculate_total(mycards)
 
-#Show Cards
+
+
+while true
 puts "Dealer has: #{dealercards[0]} and #{dealercards[1]}, for a total of #{dealertotal}"
 puts "You have #{mycards[0]} and #{mycards[1]}, for a total of #{mytotal}"
 puts
-puts "What would you like to do?  1) Hit 2) Stay"
+puts "What would you like to do?  'Hit' or 'Stay'"
 hit_or_stay=gets.chomp
 
-def hitstay(action)
-  if action.to_s.downcase=="hit"
+  if hit_or_stay.to_s.downcase=="hit"
     mycards<<deck.pop
     calculate_total(mycards)
-  elsif action.downcase=="stay"
+  elsif hit_or_stay.downcase=="stay"
     dealercards<<deck.pop
     calculate_total(dealercards)
+    break
   else "Please pick Hit or Stay"
   end
 end
-
-hitstay(hit_or_stay)
-
-#
-
 
 
 
