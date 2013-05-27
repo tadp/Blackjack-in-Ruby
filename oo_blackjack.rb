@@ -8,15 +8,44 @@
 #What are the behaviors (methods)
 #What is the state (instance variables)
 
+#is a relationship => Inheritance
+# class Animal
+#   def speak
+#     puts "from the animal"
+#   end
+# end
+
+# class Dog < Animal
+#   include Swimmable
+# end
+
+# class Cat < Animal
+#   def speak
+#     puts 'meow'
+#   end
+# end
+
+# cat1 = Cat.new
+# cat1.speak
+
+# #has a relationship => Composition
+# module Swimmable
+#   def swim
+#     puts "I'm swimming!"
+#   end
+# end
+
+# dog1 = Dog.new
+# dog1.swim
+
+require 'pry'
+
 class Card
   attr_accessor :suit, :face_value
   def initialize(s, fv)
     @suit = s
     @face_value = fv
   end
-
-
-  #at 1 hour mark
 
   def find_suit
     ret_val = case suit
@@ -29,14 +58,12 @@ class Card
   end
 
   def pretty_output
-    puts "The #{face_value} of #{find_suit}"
+    "The #{face_value} of #{find_suit}"
   end
 
-
-
-
-  @suit = ['H','D','S','C']
-  @face_value = ['2','3','4','5','6','7','8','9','10','J','Q','K','A']
+  def to_s
+    pretty_output
+  end
 
 end
 
@@ -49,42 +76,94 @@ class Deck
   def initialize
     @cards = []
     ['H','D','S','C'].each do |suit|
-      ['2','3','4','5','6','7','8','9','10','J','Q','K','A'].each do |suit|
+      ['2','3','4','5','6','7','8','9','10','J','Q','K','A'].each do |face_value|
         @cards << Card.new(suit, face_value)
       end
     end
+    scramble!
   end
 
   def deal_one
-    deck.pop
+    cards.pop
+  end
+
+  def scramble!
+    cards.shuffle!
+  end
+
+  def size
+    cards.size
   end
 
   def card
     @cards
   end
 
+end
+
+
+module Hand
+  def show_hand
+    puts "---- #{name}'s Hand ----"
+    cards.each do |card|
+      puts "=> #{card}"
+    end
+    puts "=> Total: #{total}"
+  end
+
+  def total
+      face_values = cards.map{|card| card.face_value}
+      total=0
+      face_values.each do |value|
+        if value == 'A'
+          total += 11
+        else
+          total += (value.to_i == 0 ? 10 : value.to_i)
+        end
+      end
+        #correct for Aces
+        face_values.select{|val| val == "A"}.count.times {total -= 10 if total > 21}
+      total
+  end
+
+  def add_card(new_card)
+    cards << new_card
+  end
+
+  def is_busted?
+    total > 21
+  end
 
 end
 
 class Player
-  attr_accessor :name, :playagain
-  def initialize(name,playagain)
+  include Hand
+  attr_accessor :name, :cards
+  def initialize(n)
+    @name = n
+    @cards = []
   end
-end
+  def show_flop
+    show_hand
+  end
 
-class Hand
-  attr_accessor :blackjack, :bust, :hit
-  # if mytotal == 21
-  #   puts "You hit Blackjack! You win!"
-  #   exit
-  # elsif dealer_total == 21
-  #   puts "Dealer has Blackjack! You lose!"
-  #   exit
-  # end
 end
 
 class Dealer
-  attr_accessor :shuffle
+  include Hand
+  attr_accessor :name, :cards
+
+  def initialize
+    @name = "Dealer"
+    @cards=[]
+  end
+
+  def show_flop
+    puts "---- Dealer's Hand ----"
+    puts "=> First card is hidden"
+    puts "=> Second card is #{cards[1]}"
+  end
+
   # mycards<<deck.pop
   # dealercards<<deck.pop
   # mycards<<deck.pop
@@ -93,87 +172,92 @@ class Dealer
   # mytotal=calculate_total(mycards)
 end
 
+
 class Blackjack
-  attr_accessor :game
+  attr_accessor :deck, :player, :dealer
   def initialize
-    @game=game
+    @deck = Deck.new
+    @player = Player.new("Player1")
+    @dealer = Dealer.new
     # @start=start
   end
 
-#   def start
-#     while true
-#     puts "Dealer has: #{dealercards[0]} and #{dealercards[1]}, for a total of #{dealer_total}"
-#     puts "You have #{mycards}, for a total of #{mytotal}"
-#     puts
-#     puts "What would you like to do?  'Hit' or 'Stay'"
-#     hit_or_stay=gets.chomp
-#     if hit_or_stay.downcase == "hit"
-#       mytotal=calculate_total(mycards)
-#       puts "You have #{mycards}, for a total of #{mytotal}"
-#       puts "Now dealing.."
-#       mycards<<deck.pop
-#       mytotal=calculate_total(mycards)
-#       puts "You have #{mycards}, for a total of #{mytotal}"
-#       if mytotal>21
-#         puts "You Bust!"
-#         exit
-#       end
-#     elsif hit_or_stay.downcase == "stay"
-#       puts "Ok, you have chosen to stay"
-#       puts "Dealer currently has: #{dealercards}, for a total of #{dealer_total}"
-#       puts "Dealiing..."
-#       dealercards<<deck.pop
-#       dealer_total=calculate_total(dealercards)
-#       puts "Dealer has: #{dealercards}, for a total of #{dealer_total}"
-#       while dealer_total < 17
-#         puts "Dealer has: #{dealercards}, for a total of #{dealer_total}"
-#         puts "Dealing..."
-#         dealercards<<deck.pop
-#         dealer_total=calculate_total(dealercards)
-#       end
-#       if dealer_total >21
-#         puts "Dealer busts! You Win!"
-#         exit
-#       end
-#       if dealer_total > mytotal
-#         puts "Dealer Wins with #{dealercards}! You lose!"
-#         exit
-#       end
-#     else "Please pick Hit or Stay"
-#     end
-#   end
-# end
+  def set_player_name
+    puts "What's your name?"
+    player.name = gets.chomp
+  end
 
+  def deal_cards
+    player.add_card(deck.deal_one)
+    dealer.add_card(deck.deal_one)
+    player.add_card(deck.deal_one)
+    dealer.add_card(deck.deal_one)
+  end
+
+  def show_flop
+    player.show_flop
+    dealer.show_flop
+  end
+
+  def blackjack_or_bust?(player_or_dealer)
+    if player_or_dealer.total == 21
+      if player_or_dealer.is_a?(Dealer)
+        puts "Sorry, dealer hit blackjack. #{player.name} loses."
+      else
+        puts "Congratulations, #{player.name} hit blackjack! #{player.name} wins!"
+      end
+      exit
+      elsif player_or_dealer.is_busted?
+        if player_or_dealer.is_a?(Dealer)
+          puts "Congratulations, dealer busted. #{player.name} wins!"
+        else
+          puts "Sorry, #{player.name} busted. #{player.name} loses."
+        exit
+        end
+      end
+    end
+  end
+
+  def player_turn
+    puts "#{player.name}'s turn"
+
+    blackjack_or_bust?(player)
+
+    while !player.is_busted?
+      puts "What would you like to do?  1.)Hit or 2.)Stay"
+      response = gets.chomp
+
+      if !['1','2'].include?(response)
+      puts "Error: you must enter 1 or 2"
+      next
+
+      if response == '2'
+        puts "#{player.name} chose to stay."
+        break
+      end
+
+      #hit
+      new_card = deck.deal_one
+      puts "Dealing card to #{player.name}: #{new_card}"
+      player.add_card(new_card)
+      puts "#{player.name}'s total is now #{player.total}"
+      blackjack_or_bust?(player)
+    end
+    
+    puts "#{player.name} stays."
+  end
+
+  def start
+    set_player_name
+    deal_cards
+    show_flop
+    player_turn
+    # dealer_turn
+    # who_won?(player,dealer)
+  end
 end
 
 game=Blackjack.new
 
+game.start
 
-c1 = Card.new('H','3')
-c2 = Card.new('D', '4')
-
-c1.pretty_output
-c2.pretty_output
-
-deck = Deck.new
-puts deck.card
-
-
-
-  # def calculate_total(cards) 
-  # #[['H','3'],['S','Q'] ... ]
-  #   arr = cards.map{|e| e[1]}
-  #   total=0
-  #   arr.each do |value|
-  #     if value == 'A'
-  #       total +=11
-  #     elsif value.to_i == 0 #J,Q,K
-  #       total = total + 10
-  #     else
-  #       total += value.to_i
-  #     end
-  #   end
-  #     #correct for Aces
-  #     arr.select{|e| e == "A"}.count.times {total -= 10 if total > 21}
-  #   total
-  # end
