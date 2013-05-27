@@ -15,9 +15,6 @@ class Card
     @face_value = fv
   end
 
-  def to_s
-    "#{value} of #{suit}"
-  end
 
   #at 1 hour mark
 
@@ -47,6 +44,8 @@ class Deck
   # deck = []
   #   deck = @suit.product(@face_value)
   # deck.shuffle!
+
+  attr_accessor :cards, :face_value
   def initialize
     @cards = []
     ['H','D','S','C'].each do |suit|
@@ -55,10 +54,15 @@ class Deck
       end
     end
   end
-  
+
   def deal_one
     deck.pop
   end
+
+  def card
+    @cards
+  end
+
 
 end
 
@@ -152,7 +156,7 @@ c1.pretty_output
 c2.pretty_output
 
 deck = Deck.new
-deck.deal_one #returns a card object
+puts deck.card
 
 
 
