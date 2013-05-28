@@ -26,29 +26,59 @@ helpers do
   end
   #calculate_total(session[:dealers_cards]) => 20
 
+#   Original attempt
+#   def card_image1(cards)
+#     arr = cards.map{|element| element[0]}
+#     arr.each do |a|
+#     ret_value_suit=  case a
+#                   when 'h' then 'hearts_'
+#                   when 's' then 'spades_'
+#                   when 'd' then 'diamonds_'
+#                   when 'c' then 'clubs_'
+#                 end
+#     ret_value_suit
+#     end
 
+#     arr2 = cards.map{|element| element[1]}
 
-def card_image(card) #['H','4']
-  suit = case card[0]
-    when 'H' then 'hearts'
-    when 'D' then 'diamonds'
-    when 'C' then 'clubs'
-    when 'S' then 'spades'
-  end
+#     arr2.each do |a|
+#         if a.to_i == 0 
+#             ret_value_face=  case a
+#                           when 'J' then 'jack'
+#                           when 'Q' then 'queen'
+#                           when 'K' then 'king'
+#                           when 'A' then 'ace'
+#                         end
+#             ret_value_face
+#         else
+#         ret_value_face = a.to_i
+#         end
+#       end
 
+#       "<img src='/images/cards/#{ret_value_suit}_#{ret_value_face}.jpg'>"
+#   end
+# end
 
-  value = card[1]
-  if ['J', 'Q', 'K','A'].include(value)
-    value = case card[1]
-      when 'J' then 'jack'
-      when 'Q' then 'queen'
-      when 'K' then 'king'
-      when 'A' then 'ace'
+  def card_image(card) #['H','4']
+    suit = case card[0]
+      when 'H' then 'hearts'
+      when 'D' then 'diamonds'
+      when 'C' then 'clubs'
+      when 'S' then 'spades'
     end
-  end
 
-  "<img src='/images/cards/#{suit}_#{value}.jpg'>"
-end
+    value = card[1]
+    if ['J', 'Q', 'K','A'].include?(value)
+      value = case card[1]
+        when 'J' then 'jack'
+        when 'Q' then 'queen'
+        when 'K' then 'king'
+        when 'A' then 'ace'
+      end
+    end
+
+    "<img class='card_image' src='/images/cards/#{suit}_#{value}.jpg'>"
+  end
 end
 
 
@@ -71,6 +101,11 @@ get '/new_player' do
 end
 
 post '/new_player' do
+
+  if params[:player_name].empty?
+    @error = "Name is required"
+    halt erb(:new_player)
+  end
   # "This is a post of '#{params[:player_name]}'"
   session[:player_name]=params[:player_name]
   redirect '/game'
@@ -95,15 +130,21 @@ end
 
 post '/game/player/hit' do
   session[:player_cards] << session[:deck].pop
-  if calculate_total(session[:player_cards]) > 21
-    @error = "Sorry, it looks like you busted."
+
+  player_total = calculate_total(session[:player_cards])
+  if player_total == 21
+    @success = "#{session[:player_name]} hit Blackjack!"
+    @show_hit_or_stay_buttons = false
+  elsif calculate_total(session[:player_cards]) > 21
+    @error = "Sorry, it looks like #{session[:player_name]} busted."
     @show_hit_or_stay_buttons = false
   end
   erb :game
 end
 
+
 post '/game/player/stay' do
-  @success = "You have chosen to stay"
+  @success = "#{session[:player_name]} has chosen to stay"
   @show_hit_or_stay_buttons = false
   erb :game
 end
